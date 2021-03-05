@@ -1,0 +1,107 @@
+[
+    {
+        "ID": 1,
+        "Expression": "\\sin {2 {\\pi}}",
+        "Value": "0"
+    },
+    {
+        "ID": 2,
+        "Expression": "\\sin {\\pi}",
+        "Value": "0"
+    },
+    {
+        "ID": 3,
+        "Expression": "\\sin {0}",
+        "Value": "0"
+    },
+    {
+        "ID": 4,
+        "Expression": "\\sin {\\frac{\\pi}{2}}",
+        "Value": "1"
+    },
+    {
+        "ID": 5,
+        "Expression": "\\sin {\\frac{\\pi}{3}}",
+        "Value": "0.866"
+    },
+    {
+        "ID": 6,
+        "Expression": "\\sin {\\frac{\\pi}{4}}",
+        "Value": "0.707"
+    },
+    {
+        "ID": 7,
+        "Expression": "\\sin {\\frac{\\pi}{6}}",
+        "Value": "0.5"
+    },
+    {
+        "ID": 8,
+        "Expression": "\\frac {\\sqrt {2}}{2}",
+        "Value": "0.707"
+    },
+    {
+        "ID": 9,
+        "Expression": "\\frac {\\sqrt {3}}{2}",
+        "Value": "0.866"
+    },
+    {
+        "ID": 10,
+        "Expression": "\\frac {\\sqrt {3}}{3}",
+        "Value": "0.577"
+    },
+    {
+        "ID": 11,
+        "Expression": "\\frac {1}{\\sqrt {3}}",
+        "Value": "0.577"
+    },
+    {
+        "ID": 12,
+        "Expression": "\\frac {1}{\\sqrt {2}}",
+        "Value": "0.707"
+    },
+    {
+        "ID": 13,
+        "Expression": "\\frac {2}{\\sqrt {2}}",
+        "Value": "1.414"
+    },
+    {
+        "ID": 14,
+        "Expression": "\\cos {2 {\\pi}}",
+        "Value": "1"
+    },
+    {
+        "ID": 15,
+        "Expression": "\\cos {\\pi}",
+        "Value": "-1"
+    },
+    {
+        "ID": 16,
+        "Expression": "\\cos {0}",
+        "Value": "1"
+    },
+    {
+        "ID": 17,
+        "Expression": "\\cos {\\frac{\\pi}{2}}",
+        "Value": "0"
+    },
+    {
+        "ID": 18,
+        "Expression": "\\cos{\\frac{\\pi}{3}}",
+        "Value": "0.5"
+    },
+    {
+        "ID": 19,
+        "Expression": "\\cos {\\frac{\\pi}{4}}",
+        "Value": "0.707"
+    },
+    {
+        "ID": 20,
+        "Expression": "\\cos {\\frac{\\pi}{6}}",
+        "Value": "0.866"
+    },
+    {
+        "ID": 21,
+        "Expression": "\\frac {1}{2}",
+        "Value": "0.5"
+    }
+]
