@@ -5869,6 +5869,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5195220343892293541, guid: 04bfffa462a06d846a0e801b062328e4, type: 3}
+      propertyPath: m_ModelPrefab
+      value: 
+      objectReference: {fileID: 1306640934352848695, guid: 5971fe4c87dc0eb4795e5216ff4c8e6d, type: 3}
     - target: {fileID: 5195220344481422165, guid: 04bfffa462a06d846a0e801b062328e4, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -5881,6 +5885,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5195220345511278405, guid: 04bfffa462a06d846a0e801b062328e4, type: 3}
+      propertyPath: m_ModelPrefab
+      value: 
+      objectReference: {fileID: 1306640934352848695, guid: 5971fe4c87dc0eb4795e5216ff4c8e6d, type: 3}
     - target: {fileID: 6903534386098097788, guid: 04bfffa462a06d846a0e801b062328e4, type: 3}
       propertyPath: m_Name
       value: XRRigDemo

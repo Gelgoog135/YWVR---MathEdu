@@ -153,6 +153,7 @@ def handle_client(client):  # Takes client socket as argument.
         decodedMsgs = decodedMsg.split("{break}")
 
         for x in decodedMsgs:
+            
             if(handle_message(x, client) == False):
                 break
 
@@ -182,33 +183,35 @@ def handle_client(client):  # Takes client socket as argument.
             # del clients[client]
             # broadcast(bytes("%s has left the chat." % name, "utf8"))
             # break
+        time.sleep(0.1)
     # print(clients)
 
 def handle_message(msg, client):
-    if(msg[0:7] == "{CGame}"):
-        if(clients[client] == game.Host):
-            t = Game.fromDict(json.loads(msg[7:], object_hook=customObjectDecoder))
-            game.WaitingTime = t.WaitingTime
-            game.CurrentQuestion = t.CurrentQuestion
-            game.ExpressionId = t.ExpressionId
+    try:
+        print(msg)
+        if(msg[0:7] == "{CGame}"):
+            if(clients[client] == game.Host):
+                t = Game.fromDict(json.loads(msg[7:], object_hook=customObjectDecoder))
+                game.WaitingTime = t.WaitingTime
+                game.CurrentQuestion = t.CurrentQuestion
+                game.ExpressionId = t.ExpressionId
 
-            broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
+                broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
 
-    elif (msg[0:9] == "{CPlayer}"):
-
-        print(msg[9:])
-        t = Player.fromDict(json.loads(msg[9:], object_hook=customObjectDecoder))
-        
-        idx = None
-        for i in range(len(players)):
-            if(players[i].Color == t.Color):
-                idx = i
-                break
-        if(idx != None):
-            players[i] = t
-        
-            broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"), skip=client)
-
+        elif (msg[0:9] == "{CPlayer}"):
+            t = Player.fromDict(json.loads(msg[9:], object_hook=customObjectDecoder))
+            
+            idx = None
+            for i in range(len(players)):
+                if(players[i].Color == t.Color):
+                    idx = i
+                    break
+            if(idx != None):
+                players[i] = t
+            
+                broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"), skip=client)
+    except:
+        pass
 
 def sendToClient(b_msg, client):
     global clients
