@@ -64,7 +64,7 @@ class Game:
 
     @classmethod
     def fromDict(self, d):
-        t = Game(None)
+        t = Game()
         t.MaxWaitingTime = d.MaxWaitingTime
         t.WaitingTime = d.WaitingTime
         t.CurrentQuestion = d.CurrentQuestion
@@ -195,6 +195,8 @@ def handle_message(msg, client):
             broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
 
     elif (msg[0:9] == "{CPlayer}"):
+
+        print(msg[9:])
         t = Player.fromDict(json.loads(msg[9:], object_hook=customObjectDecoder))
         
         idx = None
