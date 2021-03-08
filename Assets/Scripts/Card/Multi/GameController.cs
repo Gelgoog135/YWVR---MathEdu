@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.XR.Interaction.Toolkit;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 namespace YWVR.Card.Multi
 {
@@ -25,6 +26,7 @@ namespace YWVR.Card.Multi
         [ReadOnly] public bool isHost;
         [ReadOnly] public Player player;
         [ReadOnly] public Game game;
+        private Game pGame;
         [ReadOnly] public List<Player> players;
 
         [ReadOnly] public float currentTime;
@@ -40,6 +42,8 @@ namespace YWVR.Card.Multi
         {
             if (socketController == null)
                 socketController = GetComponent<SocketController>();
+
+            Resources.UnloadUnusedAssets();
             //SetQuestion();
         }
 
@@ -66,7 +70,7 @@ namespace YWVR.Card.Multi
                     {
                         if(p.Color != player.Color)
                         {
-                            var pc = listPlayers[p.Color].GetComponent<PlayerController>();
+                            var pc = listPlayers[p.Color - 1].GetComponent<PlayerController>();
                             pc.SetPlayer(p);
                         }
                     }
@@ -75,6 +79,9 @@ namespace YWVR.Card.Multi
 
             if(pendingJobGame != null)
             {
+                if (isHost && game != null)
+                    pendingJobGame.WaitingTime = game.WaitingTime;
+
                 game = pendingJobGame;
                 if(game.Host != null && player != null)
                 {
@@ -99,9 +106,9 @@ namespace YWVR.Card.Multi
                 player.RHandPosition = playerController.xRRig.transform.Find("Camera Offset").Find("RightHand Controller").position.ToString("F3");
                 player.RHandRotation = playerController.xRRig.transform.Find("Camera Offset").Find("RightHand Controller").rotation.ToString("F3");
 
-                var json = JsonConvert.SerializeObject(player);
+                //var json = JsonConvert.SerializeObject(player);
 
-                socketController.SendMessageToServer("{CPlayer}" + json);
+                //socketController.SendMessageToServer("{CPlayer}" + json);
             }
             //currentTime += Time.deltaTime;
             //if(currentTime <= timePerQuestion)
@@ -124,24 +131,71 @@ namespace YWVR.Card.Multi
             if(game != null && game.WaitingTime > 0)
                 UpdateWaitingTime();
 
-            if(game != null)
+            if(game != null) // && game.WaitingTime <= 0)
             {
 
+                if (pGame != null && ( pGame.IsStarted != game.IsStarted || pGame.CurrentQuestion != game.CurrentQuestion) )
+                {
+                    if(playerController != null && equation != null)
+                    {
+                        playerController.CheckResult(equation.Value);
+                        player.Score = playerController.score;
+                        SetQuestion();
+                    }
+                    //currentTime = 0;
+                    //count--;
+
+                    //game.IsStarted = true;
+                }
+                if (isHost && !game.IsStarted && game.WaitingTime <= 0)
+                {
+                    game.WaitingTime = timePerQuestion;
+                    SetQuestion();
+                    game.IsStarted = true;
+                }
+                if (isHost && game.IsStarted && game.WaitingTime <= 0)
+                {
+                    count--;
+                }
 
 
                 if (isHost)
                 {
-                    Game temp = new Game();
-                    temp.MaxWaitingTime = game.MaxWaitingTime;
-                    temp.WaitingTime = game.WaitingTime;
-                    temp.CurrentQuestion = count;
+                    game.CurrentQuestion = count;
                     if (equation == null)
-                        temp.ExpressionId = null;
+                        game.ExpressionId = null;
                     else
-                        temp.ExpressionId = equation.ID;
+                        game.ExpressionId = equation.ID;
+                }
 
-                    var json = JsonConvert.SerializeObject(temp);
+                if (game.CurrentQuestion <= 0)
+                {
+                    new SceneController(SceneController.Game.Card).ChangeToGameLobby($"Score: {playerController.score}");
+                }
+                pGame = game;
+            }
 
+            LoopSendToServer();
+            GC.Collect();
+        }
+
+        float timeElapsedServer = 0;
+        void LoopSendToServer()
+        {
+            timeElapsedServer += Time.deltaTime;
+
+            if(timeElapsedServer >= 0.05f)
+            {
+                timeElapsedServer = 0;
+
+                if (player != null)
+                {
+                    var json = JsonConvert.SerializeObject(player);
+                    socketController.SendMessageToServer("{CPlayer}" + json);
+                }
+                if (game != null && isHost)
+                {
+                    var json = JsonConvert.SerializeObject(game);
                     socketController.SendMessageToServer("{CGame}" + json);
                 }
             }
@@ -152,10 +206,11 @@ namespace YWVR.Card.Multi
             if (isHost)
             {
                 game.WaitingTime -= Time.deltaTime;
-
             }
-
-            txtQuestion.text = $"Waiting... {Mathf.RoundToInt(game.WaitingTime)}s";
+            if (!game.IsStarted)
+            {
+                txtQuestion.text = $"Waiting... {Mathf.RoundToInt(game.WaitingTime)}s";
+            }
             progressBar.transform.GetComponent<RectTransform>().SetRight(game.WaitingTime / (float)game.MaxWaitingTime * 5.0f);
         }
 
@@ -166,7 +221,10 @@ namespace YWVR.Card.Multi
             Equation tempEq;
             do
             {
-                tempEq = equationController.GetRandomEquation();
+                if (isHost)
+                    tempEq = equationController.GetRandomEquation();
+                else
+                    tempEq = equationController.GetById((int)game.ExpressionId);
             } while (!playerController.ChangeCards(tempEq.ID, tempEq.Value));
             equation = tempEq;
 

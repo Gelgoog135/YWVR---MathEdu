@@ -10,6 +10,7 @@ namespace YWVR.Card.Multi
         public float WaitingTime { get; set; }
         public int CurrentQuestion { get; set; }
         public int? ExpressionId { get; set; }
+        public bool IsStarted { get; set; }
         public int? Host { get; set; }
         //public List<Player> Players { get; set; }
 

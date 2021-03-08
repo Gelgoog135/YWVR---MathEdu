@@ -53,7 +53,7 @@ namespace YWVR.Card.Multi
 			try
 			{
 				socketConnection = new TcpClient("139.180.220.61", 33000);
-				Byte[] bytes = new Byte[Int32.MaxValue];
+				Byte[] bytes = new Byte[4096];
 				while (true)
 				{
 					// Get a stream object for reading 				
@@ -72,7 +72,7 @@ namespace YWVR.Card.Multi
                             {
                                 if (!String.IsNullOrEmpty(msg))
                                 {
-                                    Debug.Log("Message received: " + msg);
+                                    //Debug.Log("Message received: " + msg);
                                     HandleMessage(msg);
 								}
                             }
@@ -88,30 +88,36 @@ namespace YWVR.Card.Multi
 
 		private void HandleMessage(string msg)
 		{
-			//Debug.Log(msg.Substring(0, 8));
-			//Debug.Log(msg.Substring(8));
-			if (msg.Substring(0, 6) == "{Game}")
-			{
-				var json = msg.Substring(6);
-				var t = JsonConvert.DeserializeObject<Game>(json);
-				//Debug.Log(t);
-				gameController.SetGame(t);
-			}
-			else if (msg.Substring(0, 8) == "{Player}")
-			{
-				var json = msg.Substring(8);
-				var t = JsonConvert.DeserializeObject<Player>(json);
-				//Debug.Log(t);
-				color = t.Color;
-				gameController.SetPlayer(t);
-			}
-			else if (msg.Substring(0, 9) == "{Players}")
-			{
-				var json = msg.Substring(9);
-				var t = JsonConvert.DeserializeObject<List<Player>>(json);
-				//Debug.Log(t);
-				gameController.SetPlayers(t);
-			}
+            try
+            {
+                //Debug.Log(msg.Substring(0, 8));
+                //Debug.Log(msg.Substring(8));
+                if (msg.Substring(0, 6) == "{Game}")
+                {
+                    var json = msg.Substring(6);
+                    var t = JsonConvert.DeserializeObject<Game>(json);
+                    //Debug.Log(t);
+                    gameController.SetGame(t);
+                }
+                else if (msg.Substring(0, 8) == "{Player}")
+                {
+                    var json = msg.Substring(8);
+                    var t = JsonConvert.DeserializeObject<Player>(json);
+                    //Debug.Log(t);
+                    color = t.Color;
+                    gameController.SetPlayer(t);
+                }
+                else if (msg.Substring(0, 9) == "{Players}")
+                {
+                    var json = msg.Substring(9);
+                    var t = JsonConvert.DeserializeObject<List<Player>>(json);
+                    //Debug.Log(t);
+                    gameController.SetPlayers(t);
+                }
+            }
+            catch (Exception)
+            {
+            }
 		}
 		/// <summary> 	
 		/// Send message to server using socket connection. 	
@@ -133,8 +139,8 @@ namespace YWVR.Card.Multi
 					byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(msg + "{break}");
 					// Write byte array to socketConnection stream.                 
 					stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-					//Debug.Log("Client sent his message - should be received by server");
-				}
+                    //Debug.Log("Message Sent: " + msg);
+                }
 			}
 			catch (SocketException socketException)
 			{

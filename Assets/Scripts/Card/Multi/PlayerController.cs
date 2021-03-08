@@ -239,29 +239,29 @@ namespace YWVR.Card.Multi
             else
                 selectedCard = listCards[(int)p.SelectedCard];
 
-            if(!String.IsNullOrWhiteSpace(p.BodyPosition))
+            if(!string.IsNullOrWhiteSpace(p.BodyPosition))
             {
                 placeholderBody.transform.position = StringToVector3(p.BodyPosition);
             }
-            if (!String.IsNullOrWhiteSpace(p.BodyRotation))
+            if (!string.IsNullOrWhiteSpace(p.BodyRotation))
             {
                 placeholderBody.transform.rotation = StringToQuaternion(p.BodyRotation);
             }
 
-            if (!String.IsNullOrWhiteSpace(p.LHandPosition))
+            if (!string.IsNullOrWhiteSpace(p.LHandPosition))
             {
                 placeholderLHand.transform.position = StringToVector3(p.LHandPosition);
             }
-            if (!String.IsNullOrWhiteSpace(p.LHandRotation))
+            if (!string.IsNullOrWhiteSpace(p.LHandRotation))
             {
                 placeholderLHand.transform.rotation = StringToQuaternion(p.LHandRotation);
             }
 
-            if (!String.IsNullOrWhiteSpace(p.RHandPosition))
+            if (!string.IsNullOrWhiteSpace(p.RHandPosition))
             {
                 placeholderRHand.transform.position = StringToVector3(p.RHandPosition);
             }
-            if (!String.IsNullOrWhiteSpace(p.RHandRotation))
+            if (!string.IsNullOrWhiteSpace(p.RHandRotation))
             {
                 placeholderRHand.transform.rotation = StringToQuaternion(p.RHandRotation);
             }
@@ -269,8 +269,12 @@ namespace YWVR.Card.Multi
             placeholderPlayer.SetActive(true);
         }
 
-        public static Vector3 StringToVector3(String s)
+        public static Vector3 StringToVector3(string s)
         {
+            if (s.StartsWith("(") && s.EndsWith(")"))
+            {
+                s = s.Substring(1, s.Length - 2);
+            }
             string[] parts = s.Split(new string[] { "," }, StringSplitOptions.None);
             return new Vector3(
                 float.Parse(parts[0]),

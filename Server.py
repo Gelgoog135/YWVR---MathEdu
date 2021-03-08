@@ -2,6 +2,7 @@
 """Server for multithreaded (asynchronous) chat application."""
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
+import threading
 import time
 import sys
 import json
@@ -47,18 +48,20 @@ class Player:
         return t
 
 class Game:
-    MaxWaitingTime = 60
-    WaitingTime = 60
+    MaxWaitingTime = 20
+    WaitingTime = 20
     CurrentQuestion = 0
     ExpressionId = None
+    IsStarted = False
     Host = None
     # Players = []
 
     def __init__(self):
-        self.MaxWaitingTime = 60
-        self.WaitingTime = 60
+        self.MaxWaitingTime = 20
+        self.WaitingTime = 20
         self.CurrentQuestion = 0
         self.ExpressionId = None
+        self.IsStarted = False
         self.Host = None
         # self.Players = []
 
@@ -69,6 +72,7 @@ class Game:
         t.WaitingTime = d.WaitingTime
         t.CurrentQuestion = d.CurrentQuestion
         t.ExpressionId = d.ExpressionId
+        t.IsStarted = d.IsStarted
         t.Host = d.Host
         return t
 
@@ -108,8 +112,8 @@ def handle_client(client):  # Takes client socket as argument.
     clients[client] = color
 
     sendToClient(bytes("{Player}" + json.dumps(p.__dict__), "utf8"), client)
-    broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"))
-    broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"))
+    # broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"))
+    # broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"))
 
     while True:
         # try:
@@ -188,17 +192,20 @@ def handle_client(client):  # Takes client socket as argument.
 
 def handle_message(msg, client):
     try:
-        print(msg)
         if(msg[0:7] == "{CGame}"):
+            # print(msg)
             if(clients[client] == game.Host):
                 t = Game.fromDict(json.loads(msg[7:], object_hook=customObjectDecoder))
                 game.WaitingTime = t.WaitingTime
+                game.MaxWaitingTime = t.MaxWaitingTime
                 game.CurrentQuestion = t.CurrentQuestion
                 game.ExpressionId = t.ExpressionId
+                game.IsStarted = t.IsStarted
 
-                broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
+                # broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
 
         elif (msg[0:9] == "{CPlayer}"):
+            # print(msg)
             t = Player.fromDict(json.loads(msg[9:], object_hook=customObjectDecoder))
             
             idx = None
@@ -209,7 +216,7 @@ def handle_message(msg, client):
             if(idx != None):
                 players[i] = t
             
-                broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"), skip=client)
+                # broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"), skip=client)
     except:
         pass
 
@@ -249,11 +256,19 @@ def broadcast(msg, prefix="", skip=None):  # prefix is for name identification.
     prefix : string for name identification
     skip : socket instance for skipping forwarding to specific client 
     """
+    print("Broadcast: " + msg.decode())
     for sock in list(clients):
         if(sock == None or sock == skip or sock is skip):
             continue
         sendToClient(bytes(prefix, "utf8")+msg, sock)
         #sock.send(bytes(prefix, "utf8")+msg)
+
+def repeatedly_broadcast():
+    threading.Timer(0.1, repeatedly_broadcast).start()
+    broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"))
+    time.sleep(0.05)
+    broadcast(bytes("{Players}" + json.dumps(players , default=lambda o: o.__dict__), "utf8"))
+    
 
 def try_connect_port(addr):
     try:
@@ -304,5 +319,7 @@ if __name__ == "__main__":
     print("Waiting for connection...")
     ACCEPT_THREAD = Thread(target=accept_incoming_connections)
     ACCEPT_THREAD.start()
+    repeatedly_broadcast()
     ACCEPT_THREAD.join()
+
 SERVER.close()
