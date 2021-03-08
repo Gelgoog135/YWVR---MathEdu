@@ -1600,7 +1600,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Alignment: {x: 0.5, y: 1}
-  m_Text: Waiting...
+  m_Text: Connecting...
   m_Size: 200
   m_ScrollArea:
     serializedVersion: 2

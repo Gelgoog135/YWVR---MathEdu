@@ -81,12 +81,20 @@ game = Game()
 
 def accept_incoming_connections():
     """Sets up handling for incoming clients."""
+    Thread(target=check_restart).start()
     while True:
         client, client_address = SERVER.accept()
         print("%s:%s has connected." % client_address)
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
 
+def check_restart():
+    global game
+    while True:
+        if(game != None and game.IsStarted == True and game.CurrentQuestion <= 0 and game.WaitingTime <= 0):
+            print("Game Restarting...")
+            time.sleep(7)
+            game = Game()
 
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
@@ -126,6 +134,8 @@ def handle_client(client):  # Takes client socket as argument.
         #     del clients[client]
         #     break
 
+
+        
         """ Loop to decide how to forward packet"""
         try:
             msg = client.recv(BUFSIZ)
@@ -201,11 +211,6 @@ def handle_message(msg, client):
                 game.CurrentQuestion = t.CurrentQuestion
                 game.ExpressionId = t.ExpressionId
                 game.IsStarted = t.IsStarted
-
-                # if(t.IsStarted == True and t.CurrentQuestion <= 0 and t.WaitingTime <= 0):
-                #     print("T")
-                #     time.sleep(7)
-                #     game = Game()
 
                 # broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
 
