@@ -91,7 +91,8 @@ def accept_incoming_connections():
 def check_restart():
     global game
     while True:
-        if(game != None and game.IsStarted == True and game.CurrentQuestion <= 0 and game.WaitingTime <= 0):
+        # print(str(game.IsStarted) + " " + str(game.CurrentQuestion) + " " + str(game.WaitingTime))
+        if(game != None and game.IsStarted == True and game.CurrentQuestion <= 0):
             print("Game Restarting...")
             time.sleep(7)
             game = Game()
