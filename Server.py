@@ -48,18 +48,18 @@ class Player:
         return t
 
 class Game:
-    MaxWaitingTime = 20
-    WaitingTime = 20
-    CurrentQuestion = 0
+    MaxWaitingTime = 30
+    WaitingTime = 30
+    CurrentQuestion = 10
     ExpressionId = None
     IsStarted = False
     Host = None
     # Players = []
 
     def __init__(self):
-        self.MaxWaitingTime = 20
-        self.WaitingTime = 20
-        self.CurrentQuestion = 0
+        self.MaxWaitingTime = 30
+        self.WaitingTime = 30
+        self.CurrentQuestion = 10
         self.ExpressionId = None
         self.IsStarted = False
         self.Host = None
@@ -202,6 +202,11 @@ def handle_message(msg, client):
                 game.ExpressionId = t.ExpressionId
                 game.IsStarted = t.IsStarted
 
+                # if(t.IsStarted == True and t.CurrentQuestion <= 0 and t.WaitingTime <= 0):
+                #     print("T")
+                #     time.sleep(7)
+                #     game = Game()
+
                 # broadcast(bytes("{Game}" + json.dumps(game , default=lambda o: o.__dict__), "utf8"), skip=client)
 
         elif (msg[0:9] == "{CPlayer}"):
@@ -256,7 +261,7 @@ def broadcast(msg, prefix="", skip=None):  # prefix is for name identification.
     prefix : string for name identification
     skip : socket instance for skipping forwarding to specific client 
     """
-    print("Broadcast: " + msg.decode())
+    # print("Broadcast: " + msg.decode())
     for sock in list(clients):
         if(sock == None or sock == skip or sock is skip):
             continue

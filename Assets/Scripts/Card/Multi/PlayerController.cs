@@ -42,7 +42,7 @@ namespace YWVR.Card.Multi
             List<Equation> tempList = new List<Equation>();
             tempList.AddRange(equationController.GetRandomEquations(listChoices.Count, id));
 
-            if(!tempList.Any(x => x.Value == value))
+            if (!tempList.Any(x => x.Value == value))
             {
                 var eq = equationController.GetRandomEquationByValue(id, value);
                 if (eq == null)
@@ -54,7 +54,7 @@ namespace YWVR.Card.Multi
 
             listEquations = tempList;
 
-            for(int i = 0; i < listChoices.Count; i++)
+            for (int i = 0; i < listChoices.Count; i++)
             {
                 listChoices[i].text = "-";
                 listChoices[i].text = listEquations[i].Expression;
@@ -67,7 +67,7 @@ namespace YWVR.Card.Multi
             var equationController = new EquationController();
             List<Equation> tempList = new List<Equation>();
 
-            foreach(var id in ids)
+            foreach (var id in ids)
             {
                 tempList.Add(equationController.GetById(id));
             }
@@ -98,7 +98,7 @@ namespace YWVR.Card.Multi
             listCards.Add(gameObject.transform.Find("Board").Find("Card 5").gameObject);
             listCards.Add(gameObject.transform.Find("Board").Find("Card 6").gameObject);
 
-            foreach(var card in listCards)
+            foreach (var card in listCards)
             {
                 listChoices.Add(card.transform.Find("Canvas Question").Find("TEXDraw Answer").GetComponent<TEXDraw>());
             }
@@ -130,7 +130,7 @@ namespace YWVR.Card.Multi
             {
                 foreach (var card in listCards)
                 {
-                    if(card != selectedCard)
+                    if (card != selectedCard)
                     {
                         Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                         mat.color = new Color(214f / 255f, 214f / 255f, 214f / 255f);
@@ -158,7 +158,7 @@ namespace YWVR.Card.Multi
                     //selectedTime = gameController.remainingTime;
                 }
 
-                if(selectedCard != null && selectedCard != nearestCard)
+                if (selectedCard != null && selectedCard != nearestCard)
                 {
                     Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                     mat.color = new Color(230f / 255f, 112f / 255f, 112f / 255f);
@@ -204,14 +204,14 @@ namespace YWVR.Card.Multi
 
         public void CheckResult(string value)
         {
-            if(selectedEquation != null)
+            if (selectedEquation != null)
             {
-                if(selectedEquation.Value == value)
+                if (selectedEquation.Value == value)
                 {
                     score += Mathf.RoundToInt(selectedTime * 10.0f);
                 }
             }
-            txtScore.text = score.ToString();
+            //txtScore.text = score.ToString();
         }
 
         public void ClearSelected()
@@ -239,7 +239,7 @@ namespace YWVR.Card.Multi
             else
                 selectedCard = listCards[(int)p.SelectedCard];
 
-            if(!string.IsNullOrWhiteSpace(p.BodyPosition))
+            if (!string.IsNullOrWhiteSpace(p.BodyPosition))
             {
                 placeholderBody.transform.position = StringToVector3(p.BodyPosition);
             }
@@ -267,6 +267,17 @@ namespace YWVR.Card.Multi
             }
 
             placeholderPlayer.SetActive(true);
+        }
+
+        public void SetScore(Player p, List<Player> ps, List<string> colors)
+        {
+            var tempStr = "";
+            tempStr += $"{colors[p.Color - 1]} (You): {score}" + Environment.NewLine + Environment.NewLine;
+            foreach(var t in ps.Where(x => x.Color != p.Color).OrderByDescending(x => x.Score))
+            {
+                tempStr += $"{colors[t.Color - 1]}: {t.Score}" + Environment.NewLine;
+            }
+            txtScore.text = tempStr;
         }
 
         public static Vector3 StringToVector3(string s)
